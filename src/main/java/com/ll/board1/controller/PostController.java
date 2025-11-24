@@ -1,17 +1,22 @@
 package com.ll.board1.controller;
 
 import com.ll.board1.dto.PostDto;
+import com.ll.board1.entity.Post;
 import com.ll.board1.repository.PostRepository;
+import com.ll.board1.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
     private final PostRepository postRepository;
+    private final PostService postService;
 
     @GetMapping
     public String list(Model model) {
@@ -21,8 +26,8 @@ public class PostController {
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        PostDto postDto = postRepository.findById(id);
-        model.addAttribute("post", postDto);
+        com.ll.board1.entity.Post post = postService.getPostById(id);
+        model.addAttribute("post", post);
         return "posts/detail";
     }
 
@@ -33,28 +38,54 @@ public class PostController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute PostDto postDto) {
-        postRepository.save(postDto);
+    public String create(@ModelAttribute Post post) {
+        postService.createPost(post);
         return "redirect:/posts";
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable Long id, Model model ) {
-        PostDto post = postRepository.findById(id);
-        model.addAttribute("post",post);
+    public String edit(@PathVariable Long id, Model model) {
+        Post post = postService.getPostById(id);
+        model.addAttribute("post", post);
 
         return "posts/form";
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable Long id, @ModelAttribute PostDto postDto) {
-        postRepository.update(id, postDto);
-        return "redirect:/posts/"+id;
+    public String update(@PathVariable Long id, @ModelAttribute Post post) {
+        postService.updatePost(id, post);
+        return "redirect:/posts/" + id;
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
-        postRepository.delete(id);
+        postService.deletePost(id);
         return "redirect:/posts";
+    }
+
+    @GetMapping("/test/cache")
+    public String testCache() {
+        postService.testFirstLevelCache();
+        return "redirect:/posts";
+    }
+
+    @GetMapping("/test/write-behind")
+    public String testWriteBehind() {
+        postService.testWriteBehind();
+        return "redirect:/posts";
+    }
+
+    @GetMapping("/test/dirty-checking")
+    public String testDirtyChecking() {
+        postService.testDirtyChecking();
+        return "redirect:/posts";
+    }
+
+    @GetMapping("/search")
+    public String search(@RequestParam String keyword, Model model) {
+        List<Post> posts = postService.searchPosts(keyword);
+        model.addAttribute("posts", posts);
+
+        return "posts/list";
     }
 }
