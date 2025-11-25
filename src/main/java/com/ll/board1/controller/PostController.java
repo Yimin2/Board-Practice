@@ -83,7 +83,15 @@ public class PostController {
 
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model) {
-        List<Post> posts = postService.searchPosts(keyword);
+        List<Post> posts = postService.searchPostsByTitleOrContent(keyword);
+        model.addAttribute("posts", posts);
+
+        return "posts/list";
+    }
+
+    @GetMapping("/recent")
+    public String recent(Model model) {
+        List<Post> posts = postService.getRecentPosts();
         model.addAttribute("posts", posts);
 
         return "posts/list";

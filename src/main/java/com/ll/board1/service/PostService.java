@@ -3,6 +3,7 @@ package com.ll.board1.service;
 import com.ll.board1.entity.Post;
 import com.ll.board1.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,6 +89,15 @@ public class PostService {
 
     public List<Post> searchPosts(String keyword) {
         return postRepository.findByTitleContaining(keyword);
+    }
+
+    public List<Post> searchPostsByTitleOrContent(String keyword) {
+        return postRepository.findByTitleContainingOrContentContaining(keyword, keyword);
+    }
+
+    public List<Post> getRecentPosts() {
+        return postRepository.findRecentPosts(PageRequest.of(0,3));
+        //return postRepository.findByCreatedAt();
     }
 }
 
