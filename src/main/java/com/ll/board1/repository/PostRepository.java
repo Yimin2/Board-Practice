@@ -2,7 +2,9 @@ package com.ll.board1.repository;
 
 
 import com.ll.board1.entity.Post;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,8 +28,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT * FROM post WHERE title LIKE %keyword% ORDER BY id DESC", nativeQuery = true)
     List<Post> searchByTitleNative();
 
-    @Query("SELECT p FROM Post p ORDER BY p.createdAt DESC LIMIT 3")
-    List<Post> findByCreatedAt();
+    List<Post> findTop3ByOrderByCreatedAtDesc();
 
-    List<Post> findRecentPosts(Pageable pageable);
+    Page<Post> findByTitleContaining(String keyword, Pageable pageable);
+
+    Slice<Post> findAllBy(Pageable pageable);
+
 }

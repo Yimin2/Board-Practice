@@ -9,6 +9,7 @@
 <body>
 	<h1>List</h1>
 	<a href="posts/new">NEW</a>
+	<a href="posts/dummy">DUMMY</a>
 
 	<form action="/posts/search">
 		<input type="text" name="keyword">
@@ -24,7 +25,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="post : ${posts}">
+			<tr th:each="post : ${posts.getContent()}">
 				<td th:text="${post.id}"></td>
 				<td>
 					<a
@@ -35,5 +36,24 @@
 			</tr>
 		</tbody>
 	</table>
+
+	<div>
+		<span th:text="${posts.totalElements}">100</span>
+		<span th:text="${posts.number + 1}">3</span> / <span th:text="${posts.totalPages}">10</span>
+	</div>
+
+	<div>
+		<a th:href="@{/posts/search(page=0), keyword=${keyword}}">first</a>
+		<a th:if="${posts.hasPrevious()}"
+		   th:href="@{/posts/search(page=${posts.number-1}, keyword=${keyword})}">pre</a>
+		<span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+            <a th:if="${i != posts.number}"
+               th:href="@{/posts/search(page=${i}), keyword=${keyword}}" th:text="${i+1}"></a>
+            <strong th:if="${i == posts.number}" th:text="${i+1}"></strong>
+		</span>
+		<a th:if="${posts.hasNext()}"
+		   th:href="@{/posts/search(page=${posts.number+1}, keyword=${keyword})}">next</a>
+		<a th:href="@{/posts/search(page=${posts.totalPages-1}, keyword=${keyword})}">last</a>
+	</div>
 </body>
 </html>
